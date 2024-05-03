@@ -13,7 +13,7 @@ struct node *create(struct node *start, int item)
     if(temp==NULL)
     {
         printf("Insufficient Memory");
-        return ;
+        return 0;
     }
     temp->data=item;
     temp->link=NULL;
