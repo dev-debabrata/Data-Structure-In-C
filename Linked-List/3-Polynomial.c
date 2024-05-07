@@ -6,7 +6,6 @@ struct node
     int expo;
     struct node *link;
 };
-
 struct node *start1=NULL, *start2=NULL, *start3=NULL;
 struct node *create(struct node *start)
 {
