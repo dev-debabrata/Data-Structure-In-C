@@ -6,7 +6,8 @@ struct node
     int expo;
     struct node *link;
 };
-struct node *start1=NULL, *start2=NULL;
+
+struct node *start1=NULL, *start2=NULL, *start3=NULL;
 struct node *create(struct node *start)
 {
     int n, c, e, i;
@@ -46,6 +47,7 @@ struct node *create(struct node *start)
     }
     return start;
 }
+
 void display(struct node *ptr)
 {
      if(ptr==NULL)
@@ -61,6 +63,112 @@ void display(struct node *ptr)
     }
     printf("NULL");
 }
+
+void polyadd(struct node *p1, struct node *p2)
+{
+    struct node *ptr, *temp;
+    while(p1!=NULL && p2!=NULL)
+    {
+        if(p1->expo>p2->expo)
+        {
+             temp=(struct node*)malloc(sizeof(struct node));
+             temp->coeff=p1->coeff;
+             temp->expo=p1->expo;
+             temp->link=NULL;
+             if(start3==NULL)
+             {
+                 start3=temp;
+             }
+             else
+             {
+                 ptr=start3;
+                 while(ptr->link!=NULL)
+                    ptr=ptr->link;
+                 ptr->link=temp;
+             }
+             p1=p1->link;
+        }
+        else if(p2->expo>p1->expo)
+        {
+             temp=(struct node*)malloc(sizeof(struct node));
+             temp->coeff=p2->coeff;
+             temp->expo=p2->expo;
+             temp->link=NULL;
+             if(start3==NULL)
+             {
+                 start3=temp;
+             }
+             else
+             {
+                 ptr=start3;
+                 while(ptr->link!=NULL)
+                    ptr=ptr->link;
+                 ptr->link=temp;
+             }
+             p2=p2->link;
+        }
+        else if(p1->expo==p2->expo)
+        {
+             temp=(struct node*)malloc(sizeof(struct node));
+             temp->coeff=p1->coeff+p2->coeff;
+             temp->expo=p1->expo;
+             temp->link=NULL;
+             if(start3==NULL)
+             {
+                 start3=temp;
+             }
+             else
+             {
+                 ptr=start3;
+                 while(ptr->link!=NULL)
+                    ptr=ptr->link;
+                 ptr->link=temp;
+             }
+             p1=p1->link;
+             p2=p2->link;
+        }
+    }
+    while(p1!=NULL)
+    {
+         temp=(struct node*)malloc(sizeof(struct node));
+             temp->coeff=p1->coeff;
+             temp->expo=p1->expo;
+             temp->link=NULL;
+             if(start3==NULL)
+             {
+                 start3=temp;
+             }
+             else
+             {
+                 ptr=start3;
+                 while(ptr->link!=NULL)
+                    ptr=ptr->link;
+                 ptr->link=temp;
+             }
+             p1=p1->link;
+    }
+    while(p2!=NULL)
+    {
+         temp=(struct node*)malloc(sizeof(struct node));
+             temp->coeff=p2->coeff;
+             temp->expo=p2->expo;
+             temp->link=NULL;
+             if(start3==NULL)
+             {
+                 start3=temp;
+             }
+             else
+             {
+                 ptr=start3;
+                 while(ptr->link!=NULL)
+                    ptr=ptr->link;
+                 ptr->link=temp;
+             }
+             p2=p2->link;
+    }
+    display(start3);
+}
+
 int main(void)
 {
     int choice, item;
@@ -85,8 +193,11 @@ int main(void)
             printf("start2->");
             display(start2);
             break;
+        case 3:
+            polyadd(start1,start2);
+            break;
 
-        case 6:
+        case 4:
             exit(0);
 
         default:
