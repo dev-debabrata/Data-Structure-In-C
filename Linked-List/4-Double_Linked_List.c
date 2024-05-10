@@ -2,11 +2,28 @@
 #include<stdlib.h>
 struct node
 {
+    struct node *prev;
     int data;
     struct node *link;
 };
 struct node *start=NULL;
-void sll_insert_at_End(int item)
+void dll_insert_at_Begin(int item)
+{
+    struct node *temp;
+    temp=(struct node*)malloc(sizeof(struct node));
+    if(temp==NULL)
+    {
+        printf("Insufficient Memory");
+        exit(0);
+    }
+    temp->data=item;
+    temp->prev=NULL;
+    temp->link=start;
+    if(start!=NULL)
+        start->prev=temp;
+    start=temp;
+}
+void dll_insert_at_End(int item)
 {
     struct node *temp, *ptr;
     temp=(struct node*)malloc(sizeof(struct node));
@@ -18,7 +35,10 @@ void sll_insert_at_End(int item)
     temp->data=item;
     temp->link=NULL;
     if(start==NULL)
+    {
+        temp->prev=NULL;
         start=temp;
+    }
     else
     {
         ptr=start;
@@ -27,22 +47,11 @@ void sll_insert_at_End(int item)
             ptr=ptr->link;
         }
         ptr->link=temp;
+        temp->prev=ptr;
     }
 }
-void sll_insert_at_Begin(int item)
-{
-    struct node *temp;
-    temp=(struct node*)malloc(sizeof(struct node));
-    if(temp==NULL)
-    {
-        printf("Insufficient Memory");
-        exit(0);
-    }
-    temp->data=item;
-    temp->link=start;
-    start=temp;
-}
-void sll_insert_at_Any(int item, int pos)
+
+void dll_insert_at_Any(int item, int pos)
 {
     int i;
     struct node *temp, *ptr;
@@ -55,24 +64,29 @@ void sll_insert_at_Any(int item, int pos)
     temp->data=item;
     if(pos==1)
     {
+        temp->prev=NULL;
         temp->link=start;
+        if(start!=NULL)
+            start->prev=temp;
         start=temp;
     }
-    else
+    ptr=start;
+    for(i=1; i<=pos-2&&ptr!=NULL; i++)
+        ptr=ptr->link;
+    if(ptr==NULL)
     {
-        ptr=start;
-        for(i=1; i<=pos-2&&ptr!=NULL; i++)
-            ptr=ptr->link;
-        if(ptr==NULL)
-        {
-            printf("Invalid Position");
-            return;
-        }
-        temp->link=ptr->link;
-        ptr->link=temp;
+        printf("Invalid Position");
+        free(temp);
+        return;
     }
+    temp->link=ptr->link;
+    if(ptr->link!=NULL)
+        ptr->link->prev=temp;
+    ptr->link=temp;
+    temp->prev=ptr;
 }
-void sll_deletion_at_Begin()
+
+void dll_deletion_at_Begin()
 {
     struct node *ptr;
     if(start==NULL)
@@ -81,12 +95,15 @@ void sll_deletion_at_Begin()
         return;
     }
     ptr=start;
-    start=start->link; //ptr->link
+    start=start->link;
+    if(start!=NULL)
+        start->prev=NULL; //ptr->link
     free(ptr);
     // ptr becomes dangling
     ptr=NULL;
 }
-void sll_deletion_from_End()
+
+void dll_deletion_from_End()
 {
     struct node *ptr, *prevptr;
     /*case 1: No node in the Linked List*/
@@ -115,7 +132,8 @@ void sll_deletion_from_End()
     // ptr becomes dangling
     ptr=NULL;
 }
-void sll_deletion_from_Any(int pos)
+
+void dll_deletion_from_Any(int pos)
 {
     struct node *ptr, *prevptr;
     int i;
@@ -126,82 +144,26 @@ void sll_deletion_from_Any(int pos)
     }
     ptr=start;
     if(pos==1)
+    {
         start=start->link;
+        if(start!=NULL)
+            start->prev=NULL;
+    }
     else
     {
         for(i=1; i<=pos-1; i++)
         {
             prevptr=ptr;
             ptr=ptr->link;
-            if(ptr==NULL)
-            {
-                printf("Invalid Position");
-                return;
-            }
         }
         prevptr->link=ptr->link;
+        if(ptr->link!=NULL)
+            ptr->link->prev=prevptr;
     }
     free(ptr);
     ptr=NULL;
 }
-int count()
-{
-    int nodeCount=0;
-    struct node *ptr;
-    if(start==NULL)
-        return 0;
-    ptr=start;
-    while(ptr!=NULL)
-    {
-        nodeCount++;
-        ptr=ptr->link;
-    }
-    return nodeCount;
-}
-void reverse()
-{
-    struct node *prev=NULL, *curr, *next=NULL;
-    curr=start;
-    while(curr!=NULL)
-    {
-        next=curr->link;
-        curr->link=prev;
-        prev=curr;
-        curr=next;
-    }
-    start=prev;
-}
-void swap(struct node *a, struct node *b)
-{
-    int temp=a->data; //temp=10
-    a->data=b->data; //9
-    b->data=temp; //10
-}
-void bubbleSort()
-{
-    struct node *ptr, *lptr=NULL;
-    int swapped;
-    if(start=NULL)
-    {
-        printf("No node in Linked List to delete");
-        return;
-    }
-    do
-    {
-        ptr=start;
-        swapped=0;
-        while(ptr->link!=lptr)
-        {
-            if(ptr->data>ptr->link->data)
-            {
-                swap(ptr,ptr->link); // swap(ptr->data, ptr->link->data)
-                swapped=1;
-            }
-            ptr=ptr->link;
-        }
-        lptr=ptr;
-    }while(swapped);
-}
+
 void display()
 {
     struct node *ptr;
@@ -214,29 +176,27 @@ void display()
     printf("start->");
     while(ptr!=NULL)
     {
-        printf("%d->", ptr->data);
+        printf("<-%d->", ptr->data);
         ptr=ptr->link;
     }
     printf("NULL");
 }
+
 int main(void)
 {
     int ch, item, pos;
     while(1)
     {
-        printf("\n\n****Single Linked List****\n");
-        printf("\n1. Create Linked List by insertion at Begin");
-        printf("\n2. Create Linked List by insertion at End");
-        printf("\n3. Insert at Any position of Linked List");
-        printf("\n4. Delete a node from beginning of Linked List");
-        printf("\n5. Delete a node from end of Linked List");
-        printf("\n6. Delete from Any position of Linked List except begin and end");
-        printf("\n7. Count the no of nodes in the Linked List");
-        printf("\n8. Reverse the Single Linked List");
-        printf("\n9. Sort the Linked List");
+        printf("\n\n****Double Linked List****\n");
+        printf("\n1. Create Double Linked List by insertion at Begin");
+        printf("\n2. Create Double Linked List by insertion at End");
+        printf("\n3. Insert at Any position of Double Linked List");
+        printf("\n4. Delete a node from beginning of Double Linked List");
+        printf("\n5. Delete a node from end of Double Linked List");
+        printf("\n6. Delete from Any position of Double Linked List except begin and end");
 
-        printf("\n11. Display the Linked List");
-        printf("\n12. Exit");
+        printf("\n7. Display the Linked List");
+        printf("\n8. Exit");
         printf("\nEnter your choice: ");
         scanf("%d", &ch);
         switch(ch)
@@ -244,13 +204,13 @@ int main(void)
         case 1:
             printf("Enter the item to be inserted: ");
             scanf("%d", &item);
-            sll_insert_at_Begin(item);
+            dll_insert_at_Begin(item);
             break;
 
         case 2:
             printf("Enter the item to be inserted: ");
             scanf("%d", &item);
-            sll_insert_at_End(item);
+            dll_insert_at_End(item);
             break;
 
         case 3:
@@ -258,40 +218,28 @@ int main(void)
             scanf("%d", &item);
             printf("Enter the position of insertion: ");
             scanf("%d", &pos);
-            sll_insert_at_Any(item, pos);
+            dll_insert_at_Any(item, pos);
             break;
 
         case 4:
-            sll_deletion_at_Begin();
+            dll_deletion_at_Begin();
             break;
 
         case 5:
-            sll_deletion_from_End();
+            dll_deletion_from_End();
             break;
 
         case 6:
             printf("Enter position of deletion except first and last: ");
             scanf("%d", &pos);
-            sll_deletion_from_Any(pos);
+            dll_deletion_from_Any(pos);
             break;
 
         case 7:
-            printf("No of nodes in the Linked List is: %d", count());
-            break;
-
-        case 8:
-            reverse();
-            break;
-
-        case 9:
-            bubbleSort();
-            break;
-
-        case 11:
             display();
             break;
 
-        case 12:
+        case 8:
             exit(0);
 
         default:
